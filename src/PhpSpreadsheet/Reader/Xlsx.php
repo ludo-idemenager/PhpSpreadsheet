@@ -1808,7 +1808,13 @@ class Xlsx extends BaseReader
                                     $unparsedLoadedData['sheets'][$docSheet->getCodeName()]['drawingOriginalIds'] = [];
                                     foreach ($relsWorksheet->Relationship as $ele) {
                                         if ($ele['Type'] == 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing') {
-                                            $unparsedLoadedData['sheets'][$docSheet->getCodeName()]['drawingOriginalIds'][(string) $ele['Target']] = (string) $ele['Id'];
+                                            //BUGFIX - MAP TO FUTURE DRAWING ID
+                                            //See file Writer/Xlsx/Rels.php which writes the relations back with the sheetId index
+                                            $oldTarget = (string) $ele['Target'];
+                                            $fileId = $sheetId+1;
+                                            $newTarget = preg_replace("#\d*\.xml#", (string) $fileId . ".xml", $oldTarget);
+                                            
+                                            $unparsedLoadedData['sheets'][$docSheet->getCodeName()]['drawingOriginalIds'][$newTarget] = (string) $ele['Id'];
                                         }
                                     }
 
